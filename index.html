@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Treat Tracker">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="manifest" href="manifest.json">
+  <title>Treat Tracker</title>
+  <style>
+    *, *::before, *::after {
+      margin: 0; padding: 0; box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface2: #273347;
+      --good: #22c55e;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --blue: #3b82f6;
+      --purple: #a855f7;
+      --text: #f1f5f9;
+      --muted: #64748b;
+      --radius: 18px;
+    }
+
+    html { height: -webkit-fill-available; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      transition: background 0.4s ease;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    body.state-warn  { background: #1a1200; }
+    body.state-over  { background: #1a0505; animation: pulse-bg 1.6s ease-in-out infinite; }
+
+    @keyframes pulse-bg {
+      0%, 100% { background: #1a0505; }
+      50%       { background: #2d0808; }
+    }
+
+    /* ── Header ─────────────────────────────────── */
+    .header {
+      padding: 52px 20px 12px;
+      text-align: center;
+    }
+    .app-title { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+    .week-range { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+    /* ── Status ring ─────────────────────────────── */
+    .status-section {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 12px 20px 8px;
+    }
+
+    .ring-wrap { position: relative; width: 148px; height: 148px; }
+
+    .ring-svg { transform: rotate(-90deg); }
+
+    .ring-track { fill: none; stroke: var(--surface); stroke-width: 13; }
+
+    .ring-fill {
+      fill: none; stroke-width: 13; stroke-linecap: round;
+      stroke-dasharray: 392;
+      stroke-dashoffset: 392;
+      stroke: var(--good);
+      transition: stroke-dashoffset 0.45s cubic-bezier(.4,0,.2,1), stroke 0.3s ease;
+    }
+
+    .ring-inner {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+
+    .ring-num {
+      font-size: 52px; font-weight: 900; line-height: 1;
+      color: var(--good);
+      transition: color 0.3s ease;
+    }
+    .ring-denom { font-size: 13px; color: var(--muted); margin-top: 1px; }
+
+    .status-msg {
+      margin-top: 10px; font-size: 16px; font-weight: 700;
+      color: var(--good);
+      transition: color 0.3s ease;
+      min-height: 26px; text-align: center;
+    }
+
+    .pip-row { display: flex; gap: 9px; margin-top: 8px; }
+    .pip {
+      width: 13px; height: 13px; border-radius: 50%;
+      background: var(--surface2);
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .pip.on { background: var(--good); transform: scale(1.15); }
+
+    /* colour overrides by state */
+    body.state-warn  .ring-fill  { stroke: var(--warn);   }
+    body.state-warn  .ring-num   { color:  var(--warn);   }
+    body.state-warn  .status-msg { color:  var(--warn);   }
+    body.state-warn  .pip.on     { background: var(--warn); }
+
+    body.state-over  .ring-fill  { stroke: var(--danger); }
+    body.state-over  .ring-num   { color:  var(--danger); }
+    body.state-over  .status-msg { color:  var(--danger); }
+    body.state-over  .pip.on     { background: var(--danger); }
+
+    /* ── Big buttons ─────────────────────────────── */
+    .buttons {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 11px; padding: 4px 16px 0;
+    }
+
+    .btn-treat {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 7px; padding: 26px 12px;
+      border: none; border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 14px; font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.1s ease, background 0.15s ease, box-shadow 0.15s ease;
+      -webkit-user-select: none; user-select: none;
+      position: relative; overflow: hidden;
+    }
+    .btn-treat:active { transform: scale(0.93); background: var(--surface2); }
+
+    .btn-meal   { box-shadow: inset 0 0 0 2px rgba(59,130,246,.5); }
+    .btn-dessert{ box-shadow: inset 0 0 0 2px rgba(168,85,247,.5); }
+
+    .btn-ripple {
+      position: absolute; border-radius: 50%;
+      transform: scale(0); opacity: 0.4;
+      animation: ripple 0.5s linear;
+      pointer-events: none;
+    }
+    .btn-meal .btn-ripple    { background: rgba(59,130,246,.4); }
+    .btn-dessert .btn-ripple { background: rgba(168,85,247,.4); }
+    @keyframes ripple { to { transform: scale(4); opacity: 0; } }
+
+    .btn-icon { font-size: 42px; line-height: 1; }
+    .btn-label { font-size: 14px; font-weight: 700; }
+
+    /* ── Undo strip ──────────────────────────────── */
+    .undo-strip {
+      margin: 9px 16px 0;
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--surface); border-radius: 12px;
+      padding: 10px 14px; font-size: 13px;
+      max-height: 0; overflow: hidden; opacity: 0;
+      transition: max-height 0.3s ease, opacity 0.25s ease, margin 0.3s ease;
+    }
+    .undo-strip.show {
+      max-height: 60px; opacity: 1; margin-top: 9px;
+    }
+    .undo-btn {
+      background: none; border: 1px solid var(--muted);
+      color: var(--text); border-radius: 8px;
+      padding: 5px 13px; font-size: 13px; font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* ── Tabs ────────────────────────────────────── */
+    .tab-bar {
+      display: flex; margin: 12px 16px 0;
+      background: var(--surface); border-radius: 14px; padding: 4px;
+    }
+    .tab {
+      flex: 1; padding: 9px; text-align: center;
+      border: none; background: none;
+      color: var(--muted); font-size: 14px; font-weight: 700;
+      border-radius: 10px; cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+    .tab.active { background: var(--surface2); color: var(--text); }
+
+    .tab-content { padding: 14px 16px; flex: 1; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* ── Week panel ──────────────────────────────── */
+    .day-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;
+    }
+    .day-cell { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .day-name  { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+    .day-box   {
+      width: 100%; aspect-ratio: 1; border-radius: 9px;
+      background: var(--surface);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 800; color: var(--muted);
+      border: 2px solid transparent;
+    }
+    .day-box.today  { border-color: var(--blue); color: var(--text); }
+    .day-box.filled { color: var(--text); }
+    .day-box.danger { background: rgba(239,68,68,.18); color: var(--danger); }
+
+    .day-pips { display: flex; flex-wrap: wrap; gap: 2px; justify-content: center; min-height: 10px; }
+    .dpip { width: 5px; height: 5px; border-radius: 50%; }
+    .dpip-meal    { background: var(--blue);   }
+    .dpip-dessert { background: var(--purple); }
+
+    .legend {
+      display: flex; gap: 14px; margin-top: 10px;
+      font-size: 12px; color: var(--muted);
+    }
+    .legend-item { display: flex; align-items: center; gap: 5px; }
+    .legend-pip  { width: 8px; height: 8px; border-radius: 50%; }
+
+    /* ── Month panel ─────────────────────────────── */
+    .month-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .month-title { font-size: 16px; font-weight: 800; }
+    .nav-btn {
+      background: var(--surface); border: none;
+      color: var(--text); width: 34px; height: 34px;
+      border-radius: 10px; font-size: 20px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+
+    .wk-row {
+      background: var(--surface); border-radius: 12px;
+      padding: 11px 14px; margin-bottom: 7px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .wk-left  { display: flex; flex-direction: column; gap: 2px; }
+    .wk-dates { font-size: 12px; color: var(--muted); }
+    .wk-curr  { font-size: 10px; font-weight: 800; color: var(--blue); text-transform: uppercase; letter-spacing: .5px; }
+
+    .wk-right { display: flex; align-items: center; gap: 8px; }
+    .wk-pips  { display: flex; gap: 4px; }
+    .wkpip    { width: 10px; height: 10px; border-radius: 50%; background: var(--surface2); }
+    .wkpip.on { background: var(--good); }
+    .wkpip.over { background: var(--danger); }
+
+    .wk-badge { font-size: 14px; font-weight: 800; min-width: 34px; text-align: right; }
+    .clr-good   { color: var(--good);   }
+    .clr-warn   { color: var(--warn);   }
+    .clr-danger { color: var(--danger); }
+    .clr-muted  { color: var(--muted);  }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="app-title">🍽️ Treat Tracker</div>
+    <div class="week-range" id="weekRange">Loading…</div>
+  </div>
+
+  <!-- Ring -->
+  <div class="status-section">
+    <div class="ring-wrap">
+      <svg class="ring-svg" width="148" height="148" viewBox="0 0 148 148">
+        <circle class="ring-track" cx="74" cy="74" r="62"/>
+        <circle class="ring-fill"  cx="74" cy="74" r="62" id="ringFill"/>
+      </svg>
+      <div class="ring-inner">
+        <div class="ring-num"  id="ringNum">0</div>
+        <div class="ring-denom">of 3</div>
+      </div>
+    </div>
+    <div class="status-msg" id="statusMsg">All clear — enjoy! 🟢</div>
+    <div class="pip-row">
+      <div class="pip" id="pip1"></div>
+      <div class="pip" id="pip2"></div>
+      <div class="pip" id="pip3"></div>
+    </div>
+  </div>
+
+  <!-- Buttons -->
+  <div class="buttons">
+    <button class="btn-treat btn-meal"    id="btnMeal"    onclick="addTreat('meal',event)">
+      <span class="btn-icon">🍔</span>
+      <span class="btn-label">Treat Meal</span>
+    </button>
+    <button class="btn-treat btn-dessert" id="btnDessert" onclick="addTreat('dessert',event)">
+      <span class="btn-icon">🍰</span>
+      <span class="btn-label">Treat Dessert</span>
+    </button>
+  </div>
+
+  <!-- Undo -->
+  <div class="undo-strip" id="undoStrip">
+    <span id="undoMsg"></span>
+    <button class="undo-btn" onclick="undoLast()">Undo</button>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tab-bar">
+    <button class="tab active" data-tab="week"  onclick="switchTab('week')">This Week</button>
+    <button class="tab"        data-tab="month" onclick="switchTab('month')">Monthly</button>
+  </div>
+
+  <div class="tab-content">
+    <!-- Week panel -->
+    <div class="panel active" id="panel-week">
+      <div class="day-grid" id="dayGrid"></div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-pip dpip-meal"></div>Meal</div>
+        <div class="legend-item"><div class="legend-pip dpip-dessert"></div>Dessert</div>
+      </div>
+    </div>
+
+    <!-- Month panel -->
+    <div class="panel" id="panel-month">
+      <div class="month-nav">
+        <button class="nav-btn" onclick="shiftMonth(-1)">‹</button>
+        <div class="month-title" id="monthTitle"></div>
+        <button class="nav-btn" onclick="shiftMonth(1)">›</button>
+      </div>
+      <div id="monthRows"></div>
+    </div>
+  </div>
+
+  <script>
+  'use strict';
+
+  const QUOTA = 3;
+  const KEY   = 'treat-tracker-v1';
+  const DAY_NAMES = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const CIRC = 2 * Math.PI * 62; // ≈ 389.6
+
+  let undoTimer   = null;
+  let viewYear    = new Date().getFullYear();
+  let viewMonthIdx = new Date().getMonth();
+
+  /* ── Storage ──────────────────────────────────── */
+  function load() {
+    try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; }
+  }
+  function save(arr) { localStorage.setItem(KEY, JSON.stringify(arr)); }
+
+  /* ── Date helpers ─────────────────────────────── */
+  function monday(date) {
+    const d = new Date(date);
+    const day = d.getDay();
+    d.setDate(d.getDate() + (day === 0 ? -6 : 1 - day));
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+  function addDays(date, n) {
+    const d = new Date(date); d.setDate(d.getDate() + n); return d;
+  }
+  function sameDay(a, b) {
+    return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
+  }
+  function fmtShort(d) {
+    return d.toLocaleDateString('en-GB', { day:'numeric', month:'short' });
+  }
+  function fmtLong(d) {
+    return d.toLocaleDateString('en-GB', { month:'long', year:'numeric' });
+  }
+
+  function weekEntries(entries, monStart) {
+    const lo = monStart.getTime();
+    const hi = lo + 7 * 86400000;
+    return entries.filter(e => { const t = new Date(e.ts).getTime(); return t >= lo && t < hi; });
+  }
+  function dayEntries(entries, day) {
+    return entries.filter(e => sameDay(new Date(e.ts), day));
+  }
+
+  /* ── Actions ──────────────────────────────────── */
+  function addTreat(type, evt) {
+    if (evt) ripple(evt);
+    if (navigator.vibrate) navigator.vibrate(35);
+    const arr = load();
+    const entry = { id: Date.now(), type, ts: new Date().toISOString() };
+    arr.push(entry);
+    save(arr);
+    showUndo(entry);
+    render();
+  }
+
+  function undoLast() {
+    const arr = load();
+    if (!arr.length) return;
+    arr.pop();
+    save(arr);
+    hideUndo();
+    render();
+  }
+
+  function showUndo(entry) {
+    clearTimeout(undoTimer);
+    const label = entry.type === 'meal' ? '🍔 Treat Meal' : '🍰 Treat Dessert';
+    document.getElementById('undoMsg').textContent = `Added: ${label}`;
+    document.getElementById('undoStrip').classList.add('show');
+    undoTimer = setTimeout(hideUndo, 5000);
+  }
+  function hideUndo() {
+    document.getElementById('undoStrip').classList.remove('show');
+  }
+
+  function ripple(evt) {
+    const btn  = evt.currentTarget;
+    const el   = document.createElement('span');
+    const rect = btn.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    el.className = 'btn-ripple';
+    el.style.cssText = `width:${size}px;height:${size}px;left:${evt.clientX-rect.left-size/2}px;top:${evt.clientY-rect.top-size/2}px`;
+    btn.appendChild(el);
+    el.addEventListener('animationend', () => el.remove());
+  }
+
+  /* ── Render ───────────────────────────────────── */
+  function render() {
+    const entries  = load();
+    const now      = new Date();
+    const wkStart  = monday(now);
+    const wkEnd    = addDays(wkStart, 6);
+    const wkEntries = weekEntries(entries, wkStart);
+    const count    = wkEntries.length;
+
+    // Body state
+    document.body.classList.remove('state-warn','state-over');
+    if      (count > QUOTA) document.body.classList.add('state-over');
+    else if (count === QUOTA) document.body.classList.add('state-warn');
+
+    // Ring
+    const fill = document.getElementById('ringFill');
+    const pct  = Math.min(count / QUOTA, 1);
+    fill.style.strokeDasharray  = CIRC;
+    fill.style.strokeDashoffset = CIRC * (1 - pct);
+
+    document.getElementById('ringNum').textContent = count;
+
+    // Status message
+    let msg;
+    if      (count === 0)     msg = 'All clear — enjoy! 🟢';
+    else if (count < QUOTA)   msg = `${QUOTA - count} treat${QUOTA-count>1?'s':''} left ✅`;
+    else if (count === QUOTA) msg = '⚠️ AT YOUR LIMIT — be careful!';
+    else                      msg = `🚨 OVER BUDGET by ${count - QUOTA}!`;
+    document.getElementById('statusMsg').textContent = msg;
+
+    // Pips
+    for (let i = 1; i <= 3; i++) {
+      document.getElementById(`pip${i}`).classList.toggle('on', i <= Math.min(count, 3));
+    }
+
+    // Week header label
+    document.getElementById('weekRange').textContent =
+      `${fmtShort(wkStart)} – ${fmtShort(wkEnd)}`;
+
+    renderWeek(entries, wkStart, now);
+    renderMonth(entries);
+  }
+
+  function renderWeek(entries, wkStart, now) {
+    const grid = document.getElementById('dayGrid');
+    grid.innerHTML = '';
+
+    for (let i = 0; i < 7; i++) {
+      const day = addDays(wkStart, i);
+      const de  = dayEntries(entries, day);
+      const isToday  = sameDay(day, now);
+      const isFuture = day > now && !isToday;
+
+      const cell = el('div', 'day-cell');
+      const lbl  = el('div', 'day-name'); lbl.textContent = DAY_NAMES[i];
+
+      const box = el('div', 'day-box' +
+        (isToday  ? ' today'  : '') +
+        (de.length > 3 ? ' danger' : de.length > 0 ? ' filled' : ''));
+      box.textContent = de.length > 0 ? de.length : (isFuture ? '' : '·');
+
+      const pips = el('div', 'day-pips');
+      de.forEach(e => {
+        const p = el('div', `dpip dpip-${e.type}`);
+        pips.appendChild(p);
+      });
+
+      cell.append(lbl, box, pips);
+      grid.appendChild(cell);
+    }
+  }
+
+  function renderMonth(entries) {
+    document.getElementById('monthTitle').textContent =
+      fmtLong(new Date(viewYear, viewMonthIdx, 1));
+
+    const firstDay = new Date(viewYear, viewMonthIdx, 1);
+    const lastDay  = new Date(viewYear, viewMonthIdx + 1, 0);
+    const now      = new Date();
+    const curWkStart = monday(now);
+
+    // collect all Mon–Sun weeks that overlap this month
+    const weeks = [];
+    let cursor = monday(firstDay);
+    while (cursor <= lastDay) {
+      weeks.push(new Date(cursor));
+      cursor = addDays(cursor, 7);
+    }
+
+    const rows = document.getElementById('monthRows');
+    rows.innerHTML = '';
+
+    weeks.forEach(ws => {
+      const we    = addDays(ws, 6);
+      const wk    = weekEntries(entries, ws);
+      const cnt   = wk.length;
+      const isCur = sameDay(ws, curWkStart);
+
+      const row   = el('div', 'wk-row');
+      const left  = el('div', 'wk-left');
+      const dates = el('div', 'wk-dates');
+      dates.textContent = `${fmtShort(ws)} – ${fmtShort(we)}`;
+      left.appendChild(dates);
+      if (isCur) {
+        const tag = el('div', 'wk-curr');
+        tag.textContent = 'This week';
+        left.appendChild(tag);
+      }
+
+      const right = el('div', 'wk-right');
+      const pips  = el('div', 'wk-pips');
+      const slots = Math.max(cnt, 3);
+      for (let i = 0; i < Math.min(slots, 5); i++) {
+        const p = el('div', 'wkpip' + (i < cnt ? (cnt > QUOTA ? ' over' : ' on') : ''));
+        pips.appendChild(p);
+      }
+
+      const badge = el('div', 'wk-badge');
+      badge.textContent = `${cnt}/3`;
+      badge.classList.add(
+        cnt === 0 ? 'clr-muted' : cnt < QUOTA ? 'clr-good' : cnt === QUOTA ? 'clr-warn' : 'clr-danger'
+      );
+
+      right.append(pips, badge);
+      row.append(left, right);
+      rows.appendChild(row);
+    });
+  }
+
+  /* ── UI helpers ───────────────────────────────── */
+  function el(tag, cls) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    return e;
+  }
+
+  function switchTab(name) {
+    document.querySelectorAll('.tab').forEach(t =>
+      t.classList.toggle('active', t.dataset.tab === name));
+    document.getElementById('panel-week').classList.toggle('active', name === 'week');
+    document.getElementById('panel-month').classList.toggle('active', name === 'month');
+  }
+
+  function shiftMonth(dir) {
+    viewMonthIdx += dir;
+    if (viewMonthIdx < 0)  { viewMonthIdx = 11; viewYear--; }
+    if (viewMonthIdx > 11) { viewMonthIdx = 0;  viewYear++; }
+    render();
+  }
+
+  /* ── Boot ─────────────────────────────────────── */
+  render();
+
+  // refresh at midnight
+  (function scheduleMidnight() {
+    const now = new Date();
+    const ms  = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1) - now + 100;
+    setTimeout(() => { render(); scheduleMidnight(); }, ms);
+  })();
+
+  // service worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+  </script>
+</body>
+</html>
