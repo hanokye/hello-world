@@ -16,17 +16,17 @@
     }
 
     :root {
-      --bg: #0f172a;
+      --bg:      #0f172a;
       --surface: #1e293b;
-      --surface2: #273347;
-      --good: #22c55e;
-      --warn: #f59e0b;
-      --danger: #ef4444;
-      --blue: #3b82f6;
-      --purple: #a855f7;
-      --text: #f1f5f9;
-      --muted: #64748b;
-      --radius: 18px;
+      --surf2:   #273347;
+      --good:    #22c55e;
+      --warn:    #f59e0b;
+      --danger:  #ef4444;
+      --blue:    #3b82f6;
+      --purple:  #a855f7;
+      --text:    #f1f5f9;
+      --muted:   #64748b;
+      --r:       18px;
     }
 
     html { height: -webkit-fill-available; }
@@ -35,187 +35,207 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, sans-serif;
       background: var(--bg);
       color: var(--text);
-      min-height: 100vh;
-      min-height: -webkit-fill-available;
-      display: flex;
-      flex-direction: column;
+      min-height: 100vh; min-height: -webkit-fill-available;
+      display: flex; flex-direction: column;
       overflow-x: hidden;
-      transition: background 0.4s ease;
+      transition: background .4s ease;
       padding-top: env(safe-area-inset-top, 0px);
-      padding-bottom: env(safe-area-inset-bottom, 0px);
     }
 
-    body.state-warn  { background: #1a1200; }
-    body.state-over  { background: #1a0505; animation: pulse-bg 1.6s ease-in-out infinite; }
+    body.state-warn { background: #1a1200; }
+    body.state-over { background: #1a0505; animation: pulse-bg 1.6s ease-in-out infinite; }
 
     @keyframes pulse-bg {
-      0%, 100% { background: #1a0505; }
-      50%       { background: #2d0808; }
+      0%,100% { background: #1a0505; }
+      50%      { background: #2d0808; }
     }
 
-    /* ── Header ─────────────────────────────────── */
-    .header {
-      padding: 52px 20px 12px;
-      text-align: center;
+    /* ── Header ──────────────────────────────────── */
+    .header { padding: 52px 20px 10px; }
+    .header-row {
+      display: flex; align-items: center; justify-content: space-between;
     }
-    .app-title { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
-    .week-range { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .hdr-gap { width: 40px; }
+    .app-title { font-size: 20px; font-weight: 800; letter-spacing: -.5px; }
+    .settings-btn {
+      width: 40px; height: 40px; background: none; border: none;
+      font-size: 22px; cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+      border-radius: 10px; transition: background .15s;
+    }
+    .settings-btn:active { background: var(--surface); }
+    .week-range { font-size: 12px; color: var(--muted); margin-top: 3px; text-align: center; }
 
-    /* ── Status ring ─────────────────────────────── */
+    /* ── Ring ────────────────────────────────────── */
     .status-section {
       display: flex; flex-direction: column; align-items: center;
-      padding: 12px 20px 8px;
+      padding: 8px 20px 6px;
     }
-
     .ring-wrap { position: relative; width: 148px; height: 148px; }
-
-    .ring-svg { transform: rotate(-90deg); }
-
+    .ring-svg  { transform: rotate(-90deg); }
     .ring-track { fill: none; stroke: var(--surface); stroke-width: 13; }
-
     .ring-fill {
       fill: none; stroke-width: 13; stroke-linecap: round;
-      stroke-dasharray: 392;
-      stroke-dashoffset: 392;
+      stroke-dasharray: 392; stroke-dashoffset: 392;
       stroke: var(--good);
-      transition: stroke-dashoffset 0.45s cubic-bezier(.4,0,.2,1), stroke 0.3s ease;
+      transition: stroke-dashoffset .45s cubic-bezier(.4,0,.2,1), stroke .3s;
     }
-
     .ring-inner {
       position: absolute; inset: 0;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
-
-    .ring-num {
-      font-size: 52px; font-weight: 900; line-height: 1;
-      color: var(--good);
-      transition: color 0.3s ease;
-    }
+    .ring-num   { font-size: 52px; font-weight: 900; line-height: 1; color: var(--good); transition: color .3s; }
     .ring-denom { font-size: 13px; color: var(--muted); margin-top: 1px; }
 
     .status-msg {
-      margin-top: 10px; font-size: 16px; font-weight: 700;
-      color: var(--good);
-      transition: color 0.3s ease;
-      min-height: 26px; text-align: center;
+      margin-top: 8px; font-size: 16px; font-weight: 700;
+      color: var(--good); transition: color .3s;
+      min-height: 26px; text-align: center; padding: 0 12px;
     }
 
-    .pip-row { display: flex; gap: 9px; margin-top: 8px; }
-    .pip {
-      width: 13px; height: 13px; border-radius: 50%;
-      background: var(--surface2);
-      transition: background 0.3s ease, transform 0.2s ease;
+    body.state-warn .ring-fill, body.state-warn .ring-num,
+    body.state-warn .status-msg { stroke: var(--warn); color: var(--warn); }
+    body.state-over .ring-fill  { stroke: var(--danger); }
+    body.state-over .ring-num,
+    body.state-over .status-msg { color: var(--danger); }
+
+    /* ── Type bars ───────────────────────────────── */
+    .type-bars {
+      display: flex; flex-direction: column; gap: 8px;
+      width: 100%; max-width: 300px; margin-top: 10px;
     }
-    .pip.on { background: var(--good); transform: scale(1.15); }
+    .type-bar-hdr {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 12px; margin-bottom: 3px;
+    }
+    .type-bar-lbl   { font-weight: 600; }
+    .type-bar-count { font-weight: 700; }
+    .c-good   { color: var(--good);   }
+    .c-warn   { color: var(--warn);   }
+    .c-danger { color: var(--danger); }
+    .c-muted  { color: var(--muted);  }
+    .type-bar-track {
+      width: 100%; height: 7px; border-radius: 4px;
+      background: var(--surface); overflow: hidden;
+    }
+    .type-bar-fill {
+      height: 100%; width: 0; border-radius: 4px; background: var(--good);
+      transition: width .4s cubic-bezier(.4,0,.2,1), background .3s;
+    }
+    .f-good   { background: var(--good);   }
+    .f-warn   { background: var(--warn);   }
+    .f-danger { background: var(--danger); animation: bar-pulse 1.4s ease-in-out infinite; }
+    @keyframes bar-pulse { 0%,100% { opacity:1; } 50% { opacity:.6; } }
 
-    /* colour overrides by state */
-    body.state-warn  .ring-fill  { stroke: var(--warn);   }
-    body.state-warn  .ring-num   { color:  var(--warn);   }
-    body.state-warn  .status-msg { color:  var(--warn);   }
-    body.state-warn  .pip.on     { background: var(--warn); }
-
-    body.state-over  .ring-fill  { stroke: var(--danger); }
-    body.state-over  .ring-num   { color:  var(--danger); }
-    body.state-over  .status-msg { color:  var(--danger); }
-    body.state-over  .pip.on     { background: var(--danger); }
-
-    /* ── Big buttons ─────────────────────────────── */
+    /* ── Buttons ─────────────────────────────────── */
     .buttons {
       display: grid; grid-template-columns: 1fr 1fr;
-      gap: 11px; padding: 4px 16px 0;
+      gap: 11px; padding: 10px 16px 0;
     }
-
     .btn-treat {
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 7px; padding: 26px 12px;
-      border: none; border-radius: var(--radius);
-      background: var(--surface);
-      color: var(--text);
-      font-size: 14px; font-weight: 700;
-      cursor: pointer;
-      transition: transform 0.1s ease, background 0.15s ease, box-shadow 0.15s ease;
-      -webkit-user-select: none; user-select: none;
-      position: relative; overflow: hidden;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 7px; padding: 24px 12px;
+      border: none; border-radius: var(--r); background: var(--surface);
+      color: var(--text); font-size: 14px; font-weight: 700;
+      cursor: pointer; position: relative; overflow: hidden;
+      user-select: none; -webkit-user-select: none;
+      transition: transform .1s ease, background .15s ease;
     }
-    .btn-treat:active { transform: scale(0.93); background: var(--surface2); }
-
-    .btn-meal   { box-shadow: inset 0 0 0 2px rgba(59,130,246,.5); }
-    .btn-dessert{ box-shadow: inset 0 0 0 2px rgba(168,85,247,.5); }
-
+    .btn-treat:active { transform: scale(.93); background: var(--surf2); }
+    .btn-meal    { box-shadow: inset 0 0 0 2px rgba(59,130,246,.5); }
+    .btn-dessert { box-shadow: inset 0 0 0 2px rgba(168,85,247,.5); }
+    .btn-icon    { font-size: 40px; line-height: 1; }
     .btn-ripple {
       position: absolute; border-radius: 50%;
-      transform: scale(0); opacity: 0.4;
-      animation: ripple 0.5s linear;
+      transform: scale(0); opacity: .4; animation: ripple .5s linear;
       pointer-events: none;
     }
-    .btn-meal .btn-ripple    { background: rgba(59,130,246,.4); }
+    .btn-meal    .btn-ripple { background: rgba(59,130,246,.4);  }
     .btn-dessert .btn-ripple { background: rgba(168,85,247,.4); }
     @keyframes ripple { to { transform: scale(4); opacity: 0; } }
 
-    .btn-icon { font-size: 42px; line-height: 1; }
-    .btn-label { font-size: 14px; font-weight: 700; }
-
     /* ── Undo strip ──────────────────────────────── */
     .undo-strip {
-      margin: 9px 16px 0;
+      margin: 8px 16px 0;
       display: flex; align-items: center; justify-content: space-between;
       background: var(--surface); border-radius: 12px;
       padding: 10px 14px; font-size: 13px;
       max-height: 0; overflow: hidden; opacity: 0;
-      transition: max-height 0.3s ease, opacity 0.25s ease, margin 0.3s ease;
+      transition: max-height .3s ease, opacity .25s ease;
     }
-    .undo-strip.show {
-      max-height: 60px; opacity: 1; margin-top: 9px;
-    }
+    .undo-strip.show { max-height: 60px; opacity: 1; }
     .undo-btn {
       background: none; border: 1px solid var(--muted);
       color: var(--text); border-radius: 8px;
-      padding: 5px 13px; font-size: 13px; font-weight: 700;
-      cursor: pointer;
+      padding: 5px 13px; font-size: 13px; font-weight: 700; cursor: pointer;
     }
 
     /* ── Tabs ────────────────────────────────────── */
     .tab-bar {
-      display: flex; margin: 12px 16px 0;
+      display: flex; margin: 10px 16px 0;
       background: var(--surface); border-radius: 14px; padding: 4px;
     }
     .tab {
       flex: 1; padding: 9px; text-align: center;
-      border: none; background: none;
-      color: var(--muted); font-size: 14px; font-weight: 700;
-      border-radius: 10px; cursor: pointer;
-      transition: background 0.2s ease, color 0.2s ease;
+      border: none; background: none; color: var(--muted);
+      font-size: 14px; font-weight: 700; border-radius: 10px; cursor: pointer;
+      transition: background .2s, color .2s;
     }
-    .tab.active { background: var(--surface2); color: var(--text); }
+    .tab.active { background: var(--surf2); color: var(--text); }
 
-    .tab-content { padding: 14px 16px; flex: 1; }
+    .tab-content { padding: 12px 16px; flex: 1; }
     .panel { display: none; }
     .panel.active { display: block; }
 
-    /* ── Week panel ──────────────────────────────── */
-    .day-grid {
-      display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;
-    }
-    .day-cell { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    /* ── Week / day grid ─────────────────────────── */
+    .day-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 5px; }
+    .day-cell  { display: flex; flex-direction: column; align-items: center; gap: 4px; }
     .day-name  { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
-    .day-box   {
+    .day-box {
       width: 100%; aspect-ratio: 1; border-radius: 9px;
       background: var(--surface);
       display: flex; align-items: center; justify-content: center;
       font-size: 15px; font-weight: 800; color: var(--muted);
       border: 2px solid transparent;
+      transition: border-color .15s, background .15s;
     }
-    .day-box.today  { border-color: var(--blue); color: var(--text); }
-    .day-box.filled { color: var(--text); }
-    .day-box.danger { background: rgba(239,68,68,.18); color: var(--danger); }
+    .day-box.today    { border-color: var(--blue); color: var(--text); }
+    .day-box.filled   { color: var(--text); }
+    .day-box.tappable { cursor: pointer; }
+    .day-box.tappable:active { background: var(--surf2); }
+    .day-box.selected { border-color: var(--warn); background: rgba(245,158,11,.12); }
 
     .day-pips { display: flex; flex-wrap: wrap; gap: 2px; justify-content: center; min-height: 10px; }
     .dpip { width: 5px; height: 5px; border-radius: 50%; }
     .dpip-meal    { background: var(--blue);   }
     .dpip-dessert { background: var(--purple); }
 
+    /* ── Day action bar ──────────────────────────── */
+    .day-action-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--surf2); border-radius: 12px;
+      padding: 0 14px; margin-top: 0; gap: 8px;
+      max-height: 0; overflow: hidden; opacity: 0;
+      transition: max-height .3s ease, opacity .25s ease, margin-top .3s, padding .3s;
+    }
+    .day-action-bar.show {
+      max-height: 60px; opacity: 1; padding: 10px 14px; margin-top: 8px;
+    }
+    .day-action-lbl { font-size: 12px; font-weight: 700; color: var(--muted); flex-shrink: 0; }
+    .day-action-btns { display: flex; gap: 7px; }
+    .day-add-btn {
+      padding: 7px 12px; border: none; border-radius: 9px;
+      background: var(--surface); color: var(--text);
+      font-size: 13px; font-weight: 700; cursor: pointer;
+      transition: background .15s;
+    }
+    .day-add-btn:active { background: var(--bg); }
+    .day-clear-btn {
+      padding: 7px 10px; border: none; border-radius: 9px;
+      background: none; color: var(--muted); font-size: 16px; cursor: pointer;
+    }
+
+    /* ── Legend ──────────────────────────────────── */
     .legend {
       display: flex; gap: 14px; margin-top: 10px;
       font-size: 12px; color: var(--muted);
@@ -223,19 +243,42 @@
     .legend-item { display: flex; align-items: center; gap: 5px; }
     .legend-pip  { width: 8px; height: 8px; border-radius: 50%; }
 
+    /* ── Entry log ───────────────────────────────── */
+    .log-section { margin-top: 14px; border-top: 1px solid var(--surf2); padding-top: 12px; }
+    .log-hdr {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .log-title { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+    .log-count { font-size: 11px; color: var(--muted); }
+    .log-row {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--surface); border-radius: 12px;
+      padding: 10px 12px; margin-bottom: 6px; gap: 10px;
+    }
+    .log-row-left { display: flex; align-items: center; gap: 10px; flex: 1; }
+    .log-icon  { font-size: 20px; }
+    .log-name  { font-size: 14px; font-weight: 600; }
+    .log-time  { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .log-del {
+      background: none; border: none; font-size: 16px;
+      cursor: pointer; padding: 6px 8px; border-radius: 8px;
+      opacity: .45; transition: opacity .15s, background .15s; flex-shrink: 0;
+    }
+    .log-del:active { opacity: 1; background: rgba(239,68,68,.15); }
+    .log-empty { font-size: 13px; color: var(--muted); text-align: center; padding: 16px 0; }
+
     /* ── Month panel ─────────────────────────────── */
     .month-nav {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 10px;
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
     }
     .month-title { font-size: 16px; font-weight: 800; }
     .nav-btn {
-      background: var(--surface); border: none;
-      color: var(--text); width: 34px; height: 34px;
-      border-radius: 10px; font-size: 20px;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      background: var(--surface); border: none; color: var(--text);
+      width: 34px; height: 34px; border-radius: 10px;
+      font-size: 20px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
     }
-
     .wk-row {
       background: var(--surface); border-radius: 12px;
       padding: 11px 14px; margin-bottom: 7px;
@@ -244,28 +287,78 @@
     .wk-left  { display: flex; flex-direction: column; gap: 2px; }
     .wk-dates { font-size: 12px; color: var(--muted); }
     .wk-curr  { font-size: 10px; font-weight: 800; color: var(--blue); text-transform: uppercase; letter-spacing: .5px; }
-
     .wk-right { display: flex; align-items: center; gap: 8px; }
-    .wk-pips  { display: flex; gap: 4px; }
-    .wkpip    { width: 10px; height: 10px; border-radius: 50%; background: var(--surface2); }
-    .wkpip.on { background: var(--good); }
+    .wk-pips  { display: flex; gap: 4px; flex-wrap: wrap; }
+    .wkpip    { width: 10px; height: 10px; border-radius: 50%; background: var(--surf2); }
+    .wkpip.on   { background: var(--good);   }
     .wkpip.over { background: var(--danger); }
-
     .wk-badge { font-size: 14px; font-weight: 800; min-width: 34px; text-align: right; }
-    .clr-good   { color: var(--good);   }
-    .clr-warn   { color: var(--warn);   }
-    .clr-danger { color: var(--danger); }
-    .clr-muted  { color: var(--muted);  }
+
+    /* ── Settings modal ──────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0);
+      display: flex; align-items: flex-end;
+      z-index: 100; pointer-events: none;
+      transition: background .3s ease;
+    }
+    .modal-overlay.open { background: rgba(0,0,0,.65); pointer-events: all; }
+    .modal {
+      background: var(--surface); border-radius: 28px 28px 0 0;
+      width: 100%; padding: 20px 20px;
+      padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+      transform: translateY(100%);
+      transition: transform .35s cubic-bezier(.4,0,.2,1);
+    }
+    .modal-overlay.open .modal { transform: translateY(0); }
+    .modal-hdr {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;
+    }
+    .modal-title { font-size: 17px; font-weight: 800; }
+    .modal-close {
+      background: var(--surf2); border: none; color: var(--muted);
+      width: 30px; height: 30px; border-radius: 50%;
+      font-size: 14px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .quota-row {
+      background: var(--surf2); border-radius: 14px;
+      padding: 14px 16px; margin-bottom: 10px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .quota-lbl  { font-size: 15px; font-weight: 600; }
+    .quota-ctrl { display: flex; align-items: center; gap: 14px; }
+    .q-btn {
+      width: 40px; height: 40px; border-radius: 50%; border: none;
+      background: var(--bg); color: var(--text);
+      font-size: 22px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s;
+    }
+    .q-btn:active { background: #060e1c; }
+    .q-num { font-size: 28px; font-weight: 900; min-width: 36px; text-align: center; }
+    .quota-total { text-align: center; font-size: 13px; color: var(--muted); margin: 8px 0 16px; }
+    .save-btn {
+      width: 100%; padding: 16px; background: var(--blue); border: none;
+      color: #fff; font-size: 16px; font-weight: 800;
+      border-radius: 14px; cursor: pointer; transition: opacity .15s;
+    }
+    .save-btn:active { opacity: .8; }
   </style>
 </head>
 <body>
+
   <!-- Header -->
   <div class="header">
-    <div class="app-title">🍽️ Treat Tracker</div>
+    <div class="header-row">
+      <div class="hdr-gap"></div>
+      <div class="app-title">🍽️ Treat Tracker</div>
+      <button class="settings-btn" onclick="openSettings()" aria-label="Settings">⚙️</button>
+    </div>
     <div class="week-range" id="weekRange">Loading…</div>
   </div>
 
-  <!-- Ring -->
+  <!-- Ring + type bars -->
   <div class="status-section">
     <div class="ring-wrap">
       <svg class="ring-svg" width="148" height="148" viewBox="0 0 148 148">
@@ -273,31 +366,42 @@
         <circle class="ring-fill"  cx="74" cy="74" r="62" id="ringFill"/>
       </svg>
       <div class="ring-inner">
-        <div class="ring-num"  id="ringNum">0</div>
-        <div class="ring-denom">of 3</div>
+        <div class="ring-num"   id="ringNum">0</div>
+        <div class="ring-denom" id="ringDenom">of 3</div>
       </div>
     </div>
     <div class="status-msg" id="statusMsg">All clear — enjoy! 🟢</div>
-    <div class="pip-row">
-      <div class="pip" id="pip1"></div>
-      <div class="pip" id="pip2"></div>
-      <div class="pip" id="pip3"></div>
+    <div class="type-bars">
+      <div>
+        <div class="type-bar-hdr">
+          <span class="type-bar-lbl">🍟 Meals</span>
+          <span class="type-bar-count c-good" id="mealCount">0/2</span>
+        </div>
+        <div class="type-bar-track"><div class="type-bar-fill f-good" id="mealFill"></div></div>
+      </div>
+      <div>
+        <div class="type-bar-hdr">
+          <span class="type-bar-lbl">🍪 Desserts</span>
+          <span class="type-bar-count c-good" id="dessertCount">0/1</span>
+        </div>
+        <div class="type-bar-track"><div class="type-bar-fill f-good" id="dessertFill"></div></div>
+      </div>
     </div>
   </div>
 
-  <!-- Buttons -->
+  <!-- Main buttons (log for today) -->
   <div class="buttons">
-    <button class="btn-treat btn-meal"    id="btnMeal"    onclick="addTreat('meal',event)">
-      <span class="btn-icon">🍔</span>
-      <span class="btn-label">Treat Meal</span>
+    <button class="btn-treat btn-meal"    onclick="addTreat('meal',event)">
+      <span class="btn-icon">🍟</span>
+      <span>Treat Meal</span>
     </button>
-    <button class="btn-treat btn-dessert" id="btnDessert" onclick="addTreat('dessert',event)">
-      <span class="btn-icon">🍰</span>
-      <span class="btn-label">Treat Dessert</span>
+    <button class="btn-treat btn-dessert" onclick="addTreat('dessert',event)">
+      <span class="btn-icon">🍪</span>
+      <span>Treat Dessert</span>
     </button>
   </div>
 
-  <!-- Undo -->
+  <!-- Undo strip -->
   <div class="undo-strip" id="undoStrip">
     <span id="undoMsg"></span>
     <button class="undo-btn" onclick="undoLast()">Undo</button>
@@ -310,12 +414,34 @@
   </div>
 
   <div class="tab-content">
+
     <!-- Week panel -->
     <div class="panel active" id="panel-week">
       <div class="day-grid" id="dayGrid"></div>
+
+      <!-- Past-day action bar -->
+      <div class="day-action-bar" id="dayActionBar">
+        <span class="day-action-lbl" id="dayActionLbl">Log for …</span>
+        <div class="day-action-btns">
+          <button class="day-add-btn" onclick="addForDay('meal')">🍟 Meal</button>
+          <button class="day-add-btn" onclick="addForDay('dessert')">🍪 Dessert</button>
+          <button class="day-clear-btn" onclick="clearDaySelect()">✕</button>
+        </div>
+      </div>
+
       <div class="legend">
         <div class="legend-item"><div class="legend-pip dpip-meal"></div>Meal</div>
         <div class="legend-item"><div class="legend-pip dpip-dessert"></div>Dessert</div>
+        <div class="legend-item" style="color:var(--muted);font-size:11px">Tap a day to log past treat</div>
+      </div>
+
+      <!-- Entry log -->
+      <div class="log-section">
+        <div class="log-hdr">
+          <span class="log-title">This Week's Entries</span>
+          <span class="log-count" id="logCount"></span>
+        </div>
+        <div id="entryLog"></div>
       </div>
     </div>
 
@@ -328,263 +454,393 @@
       </div>
       <div id="monthRows"></div>
     </div>
+
+  </div>
+
+  <!-- Settings modal -->
+  <div class="modal-overlay" id="settingsOverlay" onclick="closeSettings()">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-hdr">
+        <span class="modal-title">⚙️ Weekly Allowance</span>
+        <button class="modal-close" onclick="closeSettings()">✕</button>
+      </div>
+      <div class="quota-row">
+        <span class="quota-lbl">🍟 Treat Meals</span>
+        <div class="quota-ctrl">
+          <button class="q-btn" onclick="adjustQ('meal',-1)">−</button>
+          <span class="q-num" id="qMeal">2</span>
+          <button class="q-btn" onclick="adjustQ('meal',1)">+</button>
+        </div>
+      </div>
+      <div class="quota-row">
+        <span class="quota-lbl">🍪 Treat Desserts</span>
+        <div class="quota-ctrl">
+          <button class="q-btn" onclick="adjustQ('dessert',-1)">−</button>
+          <span class="q-num" id="qDessert">1</span>
+          <button class="q-btn" onclick="adjustQ('dessert',1)">+</button>
+        </div>
+      </div>
+      <div class="quota-total">Combined weekly total: <strong id="qTotal">3</strong></div>
+      <button class="save-btn" onclick="saveSettingsUI()">Save</button>
+    </div>
   </div>
 
   <script>
   'use strict';
 
-  const QUOTA = 3;
-  const KEY   = 'treat-tracker-v1';
-  const DAY_NAMES = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-  const CIRC = 2 * Math.PI * 62; // ≈ 389.6
+  const EK   = 'treat-tracker-v1';
+  const SK   = 'treat-tracker-settings-v1';
+  const DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const CIRC = 2 * Math.PI * 62;   // ≈ 389.6
 
-  let undoTimer   = null;
-  let viewYear    = new Date().getFullYear();
+  let undoTimer    = null;
+  let undoState    = null;
+  let selectedDay  = null;          // Date | null — day tapped in week grid
+  let viewYear     = new Date().getFullYear();
   let viewMonthIdx = new Date().getMonth();
+  let tempQ        = null;
 
   /* ── Storage ──────────────────────────────────── */
-  function load() {
-    try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch { return []; }
-  }
-  function save(arr) { localStorage.setItem(KEY, JSON.stringify(arr)); }
+  const loadEntries  = () => { try { return JSON.parse(localStorage.getItem(EK) || '[]'); } catch { return []; } };
+  const saveEntries  = a  => localStorage.setItem(EK, JSON.stringify(a));
+  const loadSettings = () => { const d = {quotaMeal:2,quotaDessert:1}; try { return {...d,...JSON.parse(localStorage.getItem(SK)||'{}')}; } catch { return d; } };
+  const saveSettings = s  => localStorage.setItem(SK, JSON.stringify(s));
 
   /* ── Date helpers ─────────────────────────────── */
   function monday(date) {
-    const d = new Date(date);
-    const day = d.getDay();
-    d.setDate(d.getDate() + (day === 0 ? -6 : 1 - day));
-    d.setHours(0, 0, 0, 0);
-    return d;
+    const d = new Date(date), day = d.getDay();
+    d.setDate(d.getDate() + (day===0 ? -6 : 1-day));
+    d.setHours(0,0,0,0); return d;
   }
-  function addDays(date, n) {
-    const d = new Date(date); d.setDate(d.getDate() + n); return d;
-  }
-  function sameDay(a, b) {
-    return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
-  }
-  function fmtShort(d) {
-    return d.toLocaleDateString('en-GB', { day:'numeric', month:'short' });
-  }
-  function fmtLong(d) {
-    return d.toLocaleDateString('en-GB', { month:'long', year:'numeric' });
-  }
+  function addDays(date, n) { const d = new Date(date); d.setDate(d.getDate()+n); return d; }
+  function sameDay(a,b) { return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+  const fmtShort = d => d.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+  const fmtLong  = d => d.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+  const fmtTime  = d => d.toLocaleTimeString('en-GB',{hour:'numeric',minute:'2-digit',hour12:true});
 
-  function weekEntries(entries, monStart) {
-    const lo = monStart.getTime();
-    const hi = lo + 7 * 86400000;
-    return entries.filter(e => { const t = new Date(e.ts).getTime(); return t >= lo && t < hi; });
-  }
-  function dayEntries(entries, day) {
-    return entries.filter(e => sameDay(new Date(e.ts), day));
+  function wkEntries(entries, monStart) {
+    const lo = monStart.getTime(), hi = lo + 7*86400000;
+    return entries.filter(e => { const t = new Date(e.ts).getTime(); return t>=lo && t<hi; });
   }
 
   /* ── Actions ──────────────────────────────────── */
   function addTreat(type, evt) {
     if (evt) ripple(evt);
     if (navigator.vibrate) navigator.vibrate(35);
-    const arr = load();
-    const entry = { id: Date.now(), type, ts: new Date().toISOString() };
+    addAt(type, new Date());
+  }
+
+  function addForDay(type) {
+    if (!selectedDay) return;
+    if (navigator.vibrate) navigator.vibrate(35);
+    const d = new Date(selectedDay);
+    const now = new Date();
+    if (!sameDay(d, now)) d.setHours(12, 0, 0, 0);  // noon for past days
+    addAt(type, d);
+  }
+
+  function addAt(type, date) {
+    const arr   = loadEntries();
+    const entry = { id: Date.now(), type, ts: date.toISOString() };
     arr.push(entry);
-    save(arr);
-    showUndo(entry);
+    saveEntries(arr);
+    showUndo(entry, 'added');
+    render();
+  }
+
+  function removeEntry(id) {
+    const arr = loadEntries();
+    const idx = arr.findIndex(e => e.id === id);
+    if (idx === -1) return;
+    const [entry] = arr.splice(idx, 1);
+    saveEntries(arr);
+    showUndo(entry, 'removed');
     render();
   }
 
   function undoLast() {
-    const arr = load();
-    if (!arr.length) return;
-    arr.pop();
-    save(arr);
+    if (!undoState) return;
+    const { action, entry } = undoState;
+    const arr = loadEntries();
+    if (action === 'added') {
+      const i = arr.findIndex(e => e.id===entry.id);
+      if (i !== -1) arr.splice(i, 1);
+    } else {
+      const i = arr.findIndex(e => e.id > entry.id);
+      if (i === -1) arr.push({...entry}); else arr.splice(i, 0, {...entry});
+    }
+    saveEntries(arr);
+    clearTimeout(undoTimer);
     hideUndo();
     render();
   }
 
-  function showUndo(entry) {
+  function showUndo(entry, action) {
     clearTimeout(undoTimer);
-    const label = entry.type === 'meal' ? '🍔 Treat Meal' : '🍰 Treat Dessert';
-    document.getElementById('undoMsg').textContent = `Added: ${label}`;
+    undoState = { action, entry };
+    const lbl = entry.type==='meal' ? '🍟 Treat Meal' : '🍪 Treat Dessert';
+    document.getElementById('undoMsg').textContent = `${action==='added'?'Added':'Removed'}: ${lbl}`;
     document.getElementById('undoStrip').classList.add('show');
     undoTimer = setTimeout(hideUndo, 5000);
   }
   function hideUndo() {
     document.getElementById('undoStrip').classList.remove('show');
+    undoState = null;
   }
 
   function ripple(evt) {
-    const btn  = evt.currentTarget;
-    const el   = document.createElement('span');
-    const rect = btn.getBoundingClientRect();
-    const size = Math.max(rect.width, rect.height);
-    el.className = 'btn-ripple';
-    el.style.cssText = `width:${size}px;height:${size}px;left:${evt.clientX-rect.left-size/2}px;top:${evt.clientY-rect.top-size/2}px`;
-    btn.appendChild(el);
-    el.addEventListener('animationend', () => el.remove());
+    const btn = evt.currentTarget;
+    const s   = document.createElement('span');
+    const r   = btn.getBoundingClientRect();
+    const sz  = Math.max(r.width, r.height);
+    s.className = 'btn-ripple';
+    s.style.cssText = `width:${sz}px;height:${sz}px;left:${evt.clientX-r.left-sz/2}px;top:${evt.clientY-r.top-sz/2}px`;
+    btn.appendChild(s);
+    s.addEventListener('animationend', () => s.remove());
+  }
+
+  /* ── Day selection ────────────────────────────── */
+  function handleDayTap(dayIso) {
+    const day = new Date(dayIso);
+    const now = new Date();
+    if (day > now && !sameDay(day, now)) return;  // future — ignore
+    selectedDay = (selectedDay && sameDay(selectedDay, day)) ? null : day;
+    updateDayActionBar(now);
+    // Re-render grid to update selected highlight
+    renderWeekGrid(loadEntries(), monday(now), now);
+  }
+
+  function updateDayActionBar(now) {
+    const bar = document.getElementById('dayActionBar');
+    if (!selectedDay) { bar.classList.remove('show'); return; }
+    const lbl = sameDay(selectedDay, now||new Date()) ? 'Today' : `${DAYS[(selectedDay.getDay()+6)%7]} ${fmtShort(selectedDay)}`;
+    document.getElementById('dayActionLbl').textContent = `Log for ${lbl}:`;
+    bar.classList.add('show');
+  }
+
+  function clearDaySelect() {
+    selectedDay = null;
+    document.getElementById('dayActionBar').classList.remove('show');
+    renderWeekGrid(loadEntries(), monday(new Date()), new Date());
   }
 
   /* ── Render ───────────────────────────────────── */
   function render() {
-    const entries  = load();
+    const entries  = loadEntries();
+    const s        = loadSettings();
     const now      = new Date();
     const wkStart  = monday(now);
     const wkEnd    = addDays(wkStart, 6);
-    const wkEntries = weekEntries(entries, wkStart);
-    const count    = wkEntries.length;
+    const wkE      = wkEntries(entries, wkStart);
 
-    // Body state
+    const cM  = wkE.filter(e => e.type==='meal').length;
+    const cD  = wkE.filter(e => e.type==='dessert').length;
+    const cT  = wkE.length;
+    const qM  = s.quotaMeal, qD = s.quotaDessert, qT = qM + qD;
+
+    const mOver = cM > qM, dOver = cD > qD;
+    const mAt   = !mOver && cM===qM, dAt = !dOver && cD===qD;
+    const anyOver = mOver || dOver;
+    const anyAt   = !anyOver && (mAt || dAt);
+
     document.body.classList.remove('state-warn','state-over');
-    if      (count > QUOTA) document.body.classList.add('state-over');
-    else if (count === QUOTA) document.body.classList.add('state-warn');
+    if      (anyOver) document.body.classList.add('state-over');
+    else if (anyAt)   document.body.classList.add('state-warn');
 
     // Ring
+    const pct = qT > 0 ? Math.min(cT/qT, 1) : (cT>0 ? 1 : 0);
     const fill = document.getElementById('ringFill');
-    const pct  = Math.min(count / QUOTA, 1);
     fill.style.strokeDasharray  = CIRC;
-    fill.style.strokeDashoffset = CIRC * (1 - pct);
+    fill.style.strokeDashoffset = CIRC * (1-pct);
+    document.getElementById('ringNum').textContent   = cT;
+    document.getElementById('ringDenom').textContent = `of ${qT}`;
 
-    document.getElementById('ringNum').textContent = count;
-
-    // Status message
+    // Status msg
+    const overBits = [];
+    if (mOver) overBits.push(`${cM-qM} meal${cM-qM>1?'s':''} over`);
+    if (dOver) overBits.push(`${cD-qD} dessert${cD-qD>1?'s':''} over`);
     let msg;
-    if      (count === 0)     msg = 'All clear — enjoy! 🟢';
-    else if (count < QUOTA)   msg = `${QUOTA - count} treat${QUOTA-count>1?'s':''} left ✅`;
-    else if (count === QUOTA) msg = '⚠️ AT YOUR LIMIT — be careful!';
-    else                      msg = `🚨 OVER BUDGET by ${count - QUOTA}!`;
+    if (overBits.length)     msg = `🚨 OVER BUDGET: ${overBits.join(' & ')}!`;
+    else if (mAt && dAt)     msg = '⚠️ AT LIMIT on meals & desserts!';
+    else if (mAt)            msg = '⚠️ At your meal limit!';
+    else if (dAt)            msg = '⚠️ At your dessert limit!';
+    else {
+      const rem = (qM-cM)+(qD-cD);
+      msg = cT===0 ? 'All clear — enjoy! 🟢' : `${rem} treat${rem!==1?'s':''} left ✅`;
+    }
     document.getElementById('statusMsg').textContent = msg;
 
-    // Pips
-    for (let i = 1; i <= 3; i++) {
-      document.getElementById(`pip${i}`).classList.toggle('on', i <= Math.min(count, 3));
-    }
+    setBar('meal',    cM, qM);
+    setBar('dessert', cD, qD);
 
-    // Week header label
-    document.getElementById('weekRange').textContent =
-      `${fmtShort(wkStart)} – ${fmtShort(wkEnd)}`;
+    document.getElementById('weekRange').textContent = `${fmtShort(wkStart)} – ${fmtShort(wkEnd)}`;
 
-    renderWeek(entries, wkStart, now);
-    renderMonth(entries);
+    renderWeekGrid(entries, wkStart, now);
+    updateDayActionBar(now);
+    renderLog(wkE, now);
+    renderMonth(entries, s);
   }
 
-  function renderWeek(entries, wkStart, now) {
+  function setBar(type, count, quota) {
+    const fill  = document.getElementById(`${type}Fill`);
+    const label = document.getElementById(`${type}Count`);
+    const pct   = quota > 0 ? Math.min(count/quota, 1) : (count>0 ? 1 : 0);
+    fill.style.width = `${pct*100}%`;
+    const over = count > quota, at = count===quota && quota>0;
+    fill.className  = 'type-bar-fill ' + (over ? 'f-danger' : at ? 'f-warn' : 'f-good');
+    label.textContent = `${count}/${quota}`;
+    label.className   = 'type-bar-count ' + (over ? 'c-danger' : at ? 'c-warn' : 'c-good');
+  }
+
+  function renderWeekGrid(entries, wkStart, now) {
     const grid = document.getElementById('dayGrid');
     grid.innerHTML = '';
-
     for (let i = 0; i < 7; i++) {
-      const day = addDays(wkStart, i);
-      const de  = dayEntries(entries, day);
+      const day      = addDays(wkStart, i);
+      const de       = entries.filter(e => sameDay(new Date(e.ts), day));
       const isToday  = sameDay(day, now);
       const isFuture = day > now && !isToday;
+      const isSel    = selectedDay && sameDay(day, selectedDay);
 
-      const cell = el('div', 'day-cell');
-      const lbl  = el('div', 'day-name'); lbl.textContent = DAY_NAMES[i];
+      const cell = mk('div','day-cell');
+      const lbl  = mk('div','day-name'); lbl.textContent = DAYS[i];
 
-      const box = el('div', 'day-box' +
-        (isToday  ? ' today'  : '') +
-        (de.length > 3 ? ' danger' : de.length > 0 ? ' filled' : ''));
-      box.textContent = de.length > 0 ? de.length : (isFuture ? '' : '·');
+      const cls = ['day-box',
+        isToday  ? 'today'    : '',
+        de.length ? 'filled'  : '',
+        !isFuture ? 'tappable' : '',
+        isSel    ? 'selected' : ''
+      ].filter(Boolean).join(' ');
+      const box = mk('div', cls);
+      box.textContent = de.length ? de.length : (isFuture ? '' : '·');
 
-      const pips = el('div', 'day-pips');
-      de.forEach(e => {
-        const p = el('div', `dpip dpip-${e.type}`);
-        pips.appendChild(p);
-      });
+      if (!isFuture) {
+        const dayIso = day.toISOString();
+        box.onclick = () => handleDayTap(dayIso);
+      }
+
+      const pips = mk('div','day-pips');
+      de.forEach(e => { const p = mk('div',`dpip dpip-${e.type}`); pips.appendChild(p); });
 
       cell.append(lbl, box, pips);
       grid.appendChild(cell);
     }
   }
 
-  function renderMonth(entries) {
-    document.getElementById('monthTitle').textContent =
-      fmtLong(new Date(viewYear, viewMonthIdx, 1));
+  function renderLog(wkE, now) {
+    const logEl = document.getElementById('entryLog');
+    const cntEl = document.getElementById('logCount');
+    cntEl.textContent = wkE.length ? `${wkE.length} entr${wkE.length===1?'y':'ies'}` : '';
+    if (!wkE.length) { logEl.innerHTML = '<div class="log-empty">No treats logged this week</div>'; return; }
 
-    const firstDay = new Date(viewYear, viewMonthIdx, 1);
-    const lastDay  = new Date(viewYear, viewMonthIdx + 1, 0);
-    const now      = new Date();
-    const curWkStart = monday(now);
+    logEl.innerHTML = '';
+    [...wkE].sort((a,b)=>b.id-a.id).forEach(entry => {
+      const d      = new Date(entry.ts);
+      const dayLbl = sameDay(d, now) ? 'Today' : DAYS[(d.getDay()+6)%7];
 
-    // collect all Mon–Sun weeks that overlap this month
+      const row  = mk('div','log-row');
+      const left = mk('div','log-row-left');
+      const icon = mk('span','log-icon'); icon.textContent = entry.type==='meal' ? '🍟' : '🍪';
+      const info = mk('div','');
+      const name = mk('div','log-name'); name.textContent = entry.type==='meal' ? 'Treat Meal' : 'Treat Dessert';
+      const time = mk('div','log-time'); time.textContent = `${dayLbl} · ${fmtTime(d)}`;
+      info.append(name, time); left.append(icon, info);
+
+      const del = mk('button','log-del');
+      del.textContent = '🗑️'; del.setAttribute('aria-label','Remove entry');
+      del.onclick = () => removeEntry(entry.id);
+
+      row.append(left, del);
+      logEl.appendChild(row);
+    });
+  }
+
+  function renderMonth(entries, s) {
+    document.getElementById('monthTitle').textContent = fmtLong(new Date(viewYear, viewMonthIdx, 1));
+    const first   = new Date(viewYear, viewMonthIdx, 1);
+    const last    = new Date(viewYear, viewMonthIdx+1, 0);
+    const now     = new Date();
+    const curWk   = monday(now);
+    const qT      = s.quotaMeal + s.quotaDessert;
+
     const weeks = [];
-    let cursor = monday(firstDay);
-    while (cursor <= lastDay) {
-      weeks.push(new Date(cursor));
-      cursor = addDays(cursor, 7);
-    }
+    let cur = monday(first);
+    while (cur <= last) { weeks.push(new Date(cur)); cur = addDays(cur, 7); }
 
     const rows = document.getElementById('monthRows');
     rows.innerHTML = '';
-
     weeks.forEach(ws => {
-      const we    = addDays(ws, 6);
-      const wk    = weekEntries(entries, ws);
-      const cnt   = wk.length;
-      const isCur = sameDay(ws, curWkStart);
+      const we  = addDays(ws, 6);
+      const wk  = wkEntries(entries, ws);
+      const cnt = wk.length;
+      const cur = sameDay(ws, curWk);
 
-      const row   = el('div', 'wk-row');
-      const left  = el('div', 'wk-left');
-      const dates = el('div', 'wk-dates');
-      dates.textContent = `${fmtShort(ws)} – ${fmtShort(we)}`;
+      const row   = mk('div','wk-row');
+      const left  = mk('div','wk-left');
+      const dates = mk('div','wk-dates'); dates.textContent = `${fmtShort(ws)} – ${fmtShort(we)}`;
       left.appendChild(dates);
-      if (isCur) {
-        const tag = el('div', 'wk-curr');
-        tag.textContent = 'This week';
-        left.appendChild(tag);
-      }
+      if (cur) { const t = mk('div','wk-curr'); t.textContent='This week'; left.appendChild(t); }
 
-      const right = el('div', 'wk-right');
-      const pips  = el('div', 'wk-pips');
-      const slots = Math.max(cnt, 3);
-      for (let i = 0; i < Math.min(slots, 5); i++) {
-        const p = el('div', 'wkpip' + (i < cnt ? (cnt > QUOTA ? ' over' : ' on') : ''));
+      const right = mk('div','wk-right');
+      const pips  = mk('div','wk-pips');
+      const slots = Math.min(Math.max(cnt, qT), 6);
+      for (let i=0; i<slots; i++) {
+        const p = mk('div','wkpip'+(i<cnt?(cnt>qT?' over':' on'):''));
         pips.appendChild(p);
       }
-
-      const badge = el('div', 'wk-badge');
-      badge.textContent = `${cnt}/3`;
-      badge.classList.add(
-        cnt === 0 ? 'clr-muted' : cnt < QUOTA ? 'clr-good' : cnt === QUOTA ? 'clr-warn' : 'clr-danger'
-      );
-
+      const badge = mk('div','wk-badge');
+      badge.textContent = `${cnt}/${qT}`;
+      badge.classList.add(cnt===0?'c-muted':cnt<qT?'c-good':cnt===qT?'c-warn':'c-danger');
       right.append(pips, badge);
       row.append(left, right);
       rows.appendChild(row);
     });
   }
 
-  /* ── UI helpers ───────────────────────────────── */
-  function el(tag, cls) {
-    const e = document.createElement(tag);
-    if (cls) e.className = cls;
-    return e;
+  /* ── Settings ─────────────────────────────────── */
+  function openSettings() {
+    const s = loadSettings();
+    tempQ = {...s};
+    document.getElementById('qMeal').textContent    = tempQ.quotaMeal;
+    document.getElementById('qDessert').textContent = tempQ.quotaDessert;
+    refreshQTotal();
+    document.getElementById('settingsOverlay').classList.add('open');
   }
+  function adjustQ(type, delta) {
+    const k = type==='meal' ? 'quotaMeal' : 'quotaDessert';
+    tempQ[k] = Math.max(0, (tempQ[k]||0)+delta);
+    document.getElementById(type==='meal'?'qMeal':'qDessert').textContent = tempQ[k];
+    refreshQTotal();
+  }
+  function refreshQTotal() {
+    document.getElementById('qTotal').textContent = (tempQ.quotaMeal||0)+(tempQ.quotaDessert||0);
+  }
+  function saveSettingsUI() { saveSettings(tempQ); closeSettings(); render(); }
+  function closeSettings()  { document.getElementById('settingsOverlay').classList.remove('open'); }
+
+  /* ── Misc ─────────────────────────────────────── */
+  function mk(tag, cls) { const e = document.createElement(tag); if (cls) e.className=cls; return e; }
 
   function switchTab(name) {
-    document.querySelectorAll('.tab').forEach(t =>
-      t.classList.toggle('active', t.dataset.tab === name));
-    document.getElementById('panel-week').classList.toggle('active', name === 'week');
-    document.getElementById('panel-month').classList.toggle('active', name === 'month');
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab===name));
+    document.getElementById('panel-week').classList.toggle('active',  name==='week');
+    document.getElementById('panel-month').classList.toggle('active', name==='month');
   }
 
-  function shiftMonth(dir) {
-    viewMonthIdx += dir;
-    if (viewMonthIdx < 0)  { viewMonthIdx = 11; viewYear--; }
-    if (viewMonthIdx > 11) { viewMonthIdx = 0;  viewYear++; }
+  function shiftMonth(d) {
+    viewMonthIdx += d;
+    if (viewMonthIdx < 0)  { viewMonthIdx=11; viewYear--; }
+    if (viewMonthIdx > 11) { viewMonthIdx=0;  viewYear++; }
     render();
   }
 
   /* ── Boot ─────────────────────────────────────── */
   render();
-
-  // refresh at midnight
-  (function scheduleMidnight() {
+  (function midnight() {
     const now = new Date();
-    const ms  = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1) - now + 100;
-    setTimeout(() => { render(); scheduleMidnight(); }, ms);
+    setTimeout(() => { render(); midnight(); }, new Date(now.getFullYear(),now.getMonth(),now.getDate()+1)-now+100);
   })();
-
-  // service worker
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
-  }
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
   </script>
 </body>
 </html>
