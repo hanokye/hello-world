@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="110" fill="#0f172a"/>
+  <rect x="60" y="60" width="392" height="392" rx="80" fill="#1e293b"/>
+  <!-- Fork -->
+  <path d="M170 130 v60 a30 30 0 0 0 30 30 v132" stroke="#3b82f6" stroke-width="22" stroke-linecap="round" fill="none"/>
+  <path d="M150 130 v70" stroke="#3b82f6" stroke-width="16" stroke-linecap="round"/>
+  <path d="M190 130 v70" stroke="#3b82f6" stroke-width="16" stroke-linecap="round"/>
+  <!-- Knife -->
+  <path d="M310 130 v222" stroke="#a855f7" stroke-width="22" stroke-linecap="round"/>
+  <path d="M310 130 q50 0 50 80 l-50 20" stroke="#a855f7" stroke-width="18" stroke-linejoin="round" fill="none"/>
+</svg>
